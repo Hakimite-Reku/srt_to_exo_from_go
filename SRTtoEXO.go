@@ -1,13 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"strings"
 	"text/template"
+	"time"
 
 	srt "github.com/suapapa/go_subtitle"
 	"gopkg.in/yaml.v3"
+
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 const HeaderFormat = `[exedit]
@@ -21,13 +23,13 @@ audio_ch={{.UserConfig.AudioCh}}
 `
 
 const TextObjFormat = `
-[{{.Script.Idx}}]
-start={{.Script.Start}}
-end={{.Script.End}}
+[{{.SrtScript.Idx}}]
+start={{.SrtScript.Start}}
+end={{.SrtScript.End}}
 layer={{.UserConfig.Layer}}
 overlay=1
 camera=0
-[{{.Script.Idx}}.0]
+[{{.SrtScript.Idx}}.0]
 _name=テキスト
 サイズ={{.ObjConfig.Size}}
 表示速度=0.0
@@ -47,8 +49,8 @@ precision={{.TextConfig.Precision}}
 color={{.TextConfig.Color}}
 color2={{.TextConfig.Color2}}
 font={{.TextConfig.Font}}
-text={{.Script.Text}}
-[{{.Script.Idx}}.1]
+text={{.SrtScript.Text}}
+[{{.SrtScript.Idx}}.1]
 _name=標準描画
 X={{.ObjConfig.X}}
 Y={{.ObjConfig.Y}}
@@ -63,7 +65,7 @@ type Config struct {
 	UserConfig `yaml:",inline"`
 	ObjConfig  `yaml:",inline"`
 	TextConfig `yaml:",inline"`
-	srt.Script `yaml:",inline"`
+	SrtScript `yaml:",inline"`
 }
 type UserConfig struct {
 	FilePath  string `yaml:"FilePath"`
@@ -101,7 +103,12 @@ type TextConfig struct {
 	Color      string  `yaml:"Color"`
 	Color2     string  `yaml:"Color2"`
 }
-
+type SrtScript struct {
+	Idx		int
+	Start 	int
+	End 	int
+	Text	string
+}
 func main() {
 	// read config.yaml
 	var conf Config
@@ -113,30 +120,44 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fileName := file.Name()
 	book, err := srt.ReadSrt(file)
 	// error
 	if err != nil {
 		panic(err)
 	}
 
-	conf.Script = book[0]
 	// header init
 	conf.UserConfig.Length = int(book[len(book)-1].End.Seconds() * float64(conf.UserConfig.FrameRate))
 	conf.UserConfig.Width = conf.UserConfig.MovieSize[0]
 	conf.UserConfig.Height = conf.UserConfig.MovieSize[1]
-	//	header := template.Must(template.New("header").Parse(HeaderFormat))
+	header := template.Must(template.New("header").Parse(HeaderFormat))
+
+	// header write
+	exoFile, err := os.Create(fileName[:len(fileName)-4]+".exo")
+	// error
+	if err != nil {
+		panic(err)
+	}
+	defer exoFile.Close()
+
+	writer := transform.NewWriter(exoFile, unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder().Transformer)
+	header.Execute(writer, conf)
 
 	// default part init
-	writer := new(strings.Builder)
+//	writer := new(strings.Builder)
 
 	textObj := template.Must(template.New("textObj").Parse(TextObjFormat))
 
-	textObj.Execute(writer, conf)
-	fmt.Println(writer.String())
-	writer.Reset()
-
 	for _, script := range book {
-
-		fmt.Println(script.Start, " --> ", script.End)
+		conf.SrtScript.Idx = script.Idx
+		conf.SrtScript.Start = TimeToFrame(script.Start, conf.FrameRate)
+		conf.SrtScript.End = TimeToFrame(script.End, conf.FrameRate)
+		conf.SrtScript.Text = script.Text
+		textObj.Execute(writer, conf)
 	}
+}
+
+func TimeToFrame(t time.Duration, fr int) int {
+	return int(t.Seconds()) * fr
 }

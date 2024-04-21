@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/suapapa/go_subtitle v0.0.0-20170415124254-d44f19e9503b
+	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
