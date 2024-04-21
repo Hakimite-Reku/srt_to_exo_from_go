@@ -5,11 +5,9 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/mattn/go-textwriter"
 	srt "github.com/suapapa/go_subtitle"
 	"gopkg.in/yaml.v3"
-
-	"golang.org/x/text/encoding/unicode"
-	"golang.org/x/text/transform"
 )
 
 const HeaderFormat = `[exedit]
@@ -65,7 +63,7 @@ type Config struct {
 	UserConfig `yaml:",inline"`
 	ObjConfig  `yaml:",inline"`
 	TextConfig `yaml:",inline"`
-	SrtScript `yaml:",inline"`
+	SrtScript  `yaml:",inline"`
 }
 type UserConfig struct {
 	FilePath  string `yaml:"FilePath"`
@@ -104,11 +102,12 @@ type TextConfig struct {
 	Color2     string  `yaml:"Color2"`
 }
 type SrtScript struct {
-	Idx		int
-	Start 	int
-	End 	int
-	Text	string
+	Idx   int
+	Start int
+	End   int
+	Text  string
 }
+
 func main() {
 	// read config.yaml
 	var conf Config
@@ -134,18 +133,19 @@ func main() {
 	header := template.Must(template.New("header").Parse(HeaderFormat))
 
 	// header write
-	exoFile, err := os.Create(fileName[:len(fileName)-4]+".exo")
+	exoFile, err := os.Create(fileName[:len(fileName)-4] + ".exo")
 	// error
 	if err != nil {
 		panic(err)
 	}
 	defer exoFile.Close()
 
-	writer := transform.NewWriter(exoFile, unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder().Transformer)
+	writer := textwriter.NewWriter(exoFile)
+	// writer := transform.NewWriter(exoFile, unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder().Transformer)
 	header.Execute(writer, conf)
 
 	// default part init
-//	writer := new(strings.Builder)
+	//	writer := new(strings.Builder)
 
 	textObj := template.Must(template.New("textObj").Parse(TextObjFormat))
 
