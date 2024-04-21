@@ -1,0 +1,54 @@
+# UserConfig
+FilePath: C:DIR\TO\FILE.srt
+
+MovieSize: [1280, 820]
+FrameRate: 30
+AudioRate: 44100
+AudioCh: 2
+Layer: 5
+
+# ObjConfig
+# テキストの配置
+X: 0.0
+Y: 350.0
+Z: 0.0
+
+# 拡大率
+Zoom: 100.00
+# 透明度
+AlphaBlend: 0.0
+# 回転
+Rotate: 0.0
+# サイズ
+Size: 100
+# 合成モード
+Blend: 0
+
+# TextConfig
+# フォント
+Font: "メイリオ"
+
+# 太字
+Bold: false
+# 斜字
+Italic: false
+# 文字の縁取り、影の設定
+EffectType: 3
+# 長さの自動調節
+AutoAdjust: true
+# 滑らかにする
+Soft: true
+# 等間隔モード
+Monospace: false
+# テキストのそろえ方
+Align: 7
+# 字間
+SpacingX: 0
+# 行間
+SpacingY: 0
+# 高精度モード
+Precision: true
+# テキストの色
+Color: "0000ff"
+# テキストの縁、影の色
+Color2: "ffffff"
