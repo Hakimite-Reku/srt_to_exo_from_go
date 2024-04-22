@@ -1,0 +1,8 @@
+config.??ml
+cap
+*.exo
+*.exe
+.vscode
+amd64
+arm
+386

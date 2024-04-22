@@ -1,9 +1,9 @@
 # UserConfig
 FilePath: example.srt
 
-MovieSize: [1920, 1080]
-FrameRate: 60
-AudioRate: 48000
+MovieSize: [1280, 720]
+FrameRate: 30
+AudioRate: 44100
 AudioCh: 2
 Layer: 5
 
@@ -26,7 +26,7 @@ Blend: 0
 
 # TextConfig
 # フォント
-Font: Rounded M+ 1c black
+Font: メイリオ
 
 # 太字
 Bold: false
