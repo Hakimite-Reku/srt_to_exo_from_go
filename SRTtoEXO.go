@@ -10,8 +10,8 @@ import (
 	srt "github.com/suapapa/go_subtitle"
 	"golang.org/x/text/encoding/japanese"
 
-	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"gopkg.in/yaml.v3"
 )
@@ -124,6 +124,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer file.Close()
 	fileName := file.Name()
 	book, err := srt.ReadSrt(file)
 	// error
@@ -171,7 +172,7 @@ func main() {
 }
 
 func TimeToFrame(t time.Duration, fr int) int {
-	return int(t.Seconds()) * fr
+	return int(t.Seconds() * float64(fr))
 }
 
 func ConvertExoText(str string, Encoder *encoding.Encoder) string {

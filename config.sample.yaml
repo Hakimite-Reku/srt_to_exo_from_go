@@ -1,6 +1,6 @@
 # UserConfig
 FilePath: example.srt
-
+# 動画サイズ [横幅, 縦幅]
 MovieSize: [1280, 720]
 FrameRate: 30
 AudioRate: 44100
@@ -21,33 +21,33 @@ AlphaBlend: 0.0
 Rotate: 0.0
 # サイズ
 Size: 100
-# 合成モード
+# 合成モード 0 ~ 13
 Blend: 0
 
 # TextConfig
 # フォント
 Font: メイリオ
 
-# 太字
-Bold: false
-# 斜字
-Italic: false
-# 文字の縁取り、影の設定
+# 太字 0 or 1
+Bold: 0
+# 斜字 0 or 1
+Italic: 0
+# 文字の縁取り、影の設定 0 ~ 6
 EffectType: 3
-# 長さの自動調節
-AutoAdjust: true
-# 滑らかにする
-Soft: true
-# 等間隔モード
-Monospace: false
-# テキストのそろえ方
+# 長さの自動調節 0 or 1
+AutoAdjust: 0
+# 滑らかにする 0 or 1
+Soft: 0
+# 等間隔モード 0 or 1
+Monospace: 0
+# テキストのそろえ方 0 ~ 17
 Align: 7
 # 字間
 SpacingX: 0
 # 行間
 SpacingY: 0
-# 高精度モード
-Precision: true
+# 高精度モード 0 or 1
+Precision: 0
 # テキストの色
 Color: "0000ff"
 # テキストの縁、影の色
