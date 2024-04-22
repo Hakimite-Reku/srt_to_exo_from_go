@@ -1,12 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"text/template"
 	"time"
 
-	"github.com/mattn/go-textwriter"
 	srt "github.com/suapapa/go_subtitle"
+	"golang.org/x/text/encoding/japanese"
+
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/transform"
 	"gopkg.in/yaml.v3"
 )
 
@@ -58,7 +64,6 @@ Z={{.ObjConfig.Z}}
 回転={{.ObjConfig.Rotate}}
 blend={{.ObjConfig.Blend}}
 `
-
 type Config struct {
 	UserConfig `yaml:",inline"`
 	ObjConfig  `yaml:",inline"`
@@ -88,16 +93,16 @@ type ObjConfig struct {
 }
 type TextConfig struct {
 	Font       string  `yaml:"Font"`
-	Bold       bool    `yaml:"Bold"`
-	Italic     bool    `yaml:"Italic"`
+	Bold       int    `yaml:"Bold"`
+	Italic     int    `yaml:"Italic"`
 	EffectType int     `yaml:"EffectType"`
-	AutoAdjust bool    `yaml:"AutoAdjust"`
-	Soft       bool    `yaml:"Soft"`
-	Monospace  bool    `yaml:"Monospace"`
+	AutoAdjust int    `yaml:"AutoAdjust"`
+	Soft       int    `yaml:"Soft"`
+	Monospace  int    `yaml:"Monospace"`
 	Align      int     `yaml:"Align"`
 	SpacingX   float32 `yaml:"SpacingX"`
 	SpacingY   float32 `yaml:"SpacingY"`
-	Precision  bool    `yaml:"Precision"`
+	Precision  int    `yaml:"Precision"`
 	Color      string  `yaml:"Color"`
 	Color2     string  `yaml:"Color2"`
 }
@@ -131,6 +136,7 @@ func main() {
 	conf.UserConfig.Width = conf.UserConfig.MovieSize[0]
 	conf.UserConfig.Height = conf.UserConfig.MovieSize[1]
 	header := template.Must(template.New("header").Parse(HeaderFormat))
+	str := new(strings.Builder)
 
 	// header write
 	exoFile, err := os.Create(fileName[:len(fileName)-4] + ".exo")
@@ -139,25 +145,45 @@ func main() {
 		panic(err)
 	}
 	defer exoFile.Close()
+	// default part init
+	sfjsEncoder := japanese.ShiftJIS.NewEncoder()
+	Encoder := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder()
 
-	writer := textwriter.NewWriter(exoFile)
-	// writer := transform.NewWriter(exoFile, unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder().Transformer)
-	header.Execute(writer, conf)
+
+	writer := transform.NewWriter(exoFile, sfjsEncoder)
+	defer exoFile.Close()
+
+	header.Execute(str, conf)
+	writer.Write([]byte(ConvertCRLF(str.String())))
+	str.Reset()
 
 	// default part init
-	//	writer := new(strings.Builder)
-
 	textObj := template.Must(template.New("textObj").Parse(TextObjFormat))
-
 	for _, script := range book {
-		conf.SrtScript.Idx = script.Idx
-		conf.SrtScript.Start = TimeToFrame(script.Start, conf.FrameRate)
+		conf.SrtScript.Idx = script.Idx - 1
+		conf.SrtScript.Start = TimeToFrame(script.Start, conf.FrameRate) + 1
 		conf.SrtScript.End = TimeToFrame(script.End, conf.FrameRate)
-		conf.SrtScript.Text = script.Text
-		textObj.Execute(writer, conf)
+		conf.SrtScript.Text = ConvertExoText(script.Text, Encoder)
+		textObj.Execute(str, conf)
+		writer.Write([]byte(ConvertCRLF(str.String())))
+		str.Reset()
 	}
 }
 
 func TimeToFrame(t time.Duration, fr int) int {
 	return int(t.Seconds()) * fr
+}
+
+func ConvertExoText(str string, Encoder *encoding.Encoder) string {
+	encStr, _, _ := transform.String(Encoder, str)
+	ret := fmt.Sprintf("%x", encStr)
+	ret = ret + strings.Repeat("0", 4096 - len(ret))
+	return ret
+}
+
+func ConvertCRLF(str string) string {
+    return strings.NewReplacer(
+        "\r", "\r\n",
+        "\n", "\r\n",
+    ).Replace(str)
 }

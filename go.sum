@@ -3,8 +3,6 @@ github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfn
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
-github.com/mattn/go-textwriter v0.0.0-20181119162310-5c7d3141ce2d h1:nE/sfNGK7/PZyYkzPcSZmzfPgABooU0gge37YgJXngQ=
-github.com/mattn/go-textwriter v0.0.0-20181119162310-5c7d3141ce2d/go.mod h1:vFoSIr2RExFGaVXySKcE8CTbI7Zbr8udRukVCriD8ew=
 github.com/suapapa/go_subtitle v0.0.0-20170415124254-d44f19e9503b h1:/Y0kr/gbkYAP3IMr4AFFjoVnqt+t8AU3wB5fjebn1o4=
 github.com/suapapa/go_subtitle v0.0.0-20170415124254-d44f19e9503b/go.mod h1:Dt3N8Plqve5EC3SRwpWnW/JLrzBCAgLaGZzfv0CSDTU=
 golang.org/x/net v0.24.0 h1:1PcaxkF854Fu3+lvBIx5SYn9wRlBzzcnHZSiaFFAb0w=
