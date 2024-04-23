@@ -71,7 +71,6 @@ type Config struct {
 	SrtScript  `yaml:",inline"`
 }
 type UserConfig struct {
-	FilePath  string `yaml:"FilePath"`
 	MovieSize []int  `yaml:"MovieSize"`
 	FrameRate int    `yaml:"FrameRate"`
 	AudioRate int    `yaml:"AudioRate"`
@@ -114,23 +113,29 @@ type SrtScript struct {
 }
 
 func main() {
-	// read config.yaml
-	var conf Config
-	confFile, _ := os.ReadFile("config.yaml")
-	yaml.Unmarshal(confFile, &conf)
+	var fileName string
+	if len(os.Args) < 2 {
+		fmt.Scanf("ファイルを指定してください\n%s", &fileName)
+	} else {
+		fileName = os.Args[1]
+	}
 	// .srt file open
-	file, err := os.Open(conf.UserConfig.FilePath)
+	file, err := os.Open(fileName)
 	// error
 	if err != nil {
-		panic(err)
+		panic("ファイルが間違っています")
 	}
 	defer file.Close()
-	fileName := file.Name()
 	book, err := srt.ReadSrt(file)
 	// error
 	if err != nil {
 		panic(err)
 	}
+
+	// read config.yaml
+	var conf Config
+	confFile, _ := os.ReadFile("config.yaml")
+	yaml.Unmarshal(confFile, &conf)
 
 	// header init
 	conf.UserConfig.Length = int(book[len(book)-1].End.Seconds() * float64(conf.UserConfig.FrameRate))

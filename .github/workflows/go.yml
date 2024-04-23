@@ -35,7 +35,7 @@ jobs:
     - name: Upload .exe file
       uses: actions/upload-artifact@v4
       with:
-        name: exe_file_${{ matrix.arch }}
+        name: ${{ matrix.arch }}
         path: SRTtoEXO_${{ matrix.arch }}.exe
 
     - name: Test
@@ -55,16 +55,12 @@ jobs:
 
       - name: Download .exe file
         uses: actions/download-artifact@v4
-        with:
-          path: exe_file
-          pattern: exe_file_*
-          merge-multiple: true
 
       - name: Set config.yaml
         run:  cp config.sample.yaml config.yaml
 
       - name: Archive
-        run: zip SRTtoEXO.zip exe_file/*.exe config.yaml LICENSE README.txt
+        run: zip SRTtoEXO.zip */*.exe config.yaml LICENSE README.txt
 
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
