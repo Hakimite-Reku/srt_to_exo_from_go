@@ -62,7 +62,7 @@ jobs:
         run:  cp config.sample.yaml config.yaml
 
       - name: Archive
-        run: zip SRTtoEXO.zip SRTtoEXO_*.exe config.yaml LICENSE README.txt
+        run: zip SRTtoEXO.zip *.exe config.yaml LICENSE README.txt
 
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
