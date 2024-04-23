@@ -1,0 +1,37 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: Go
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    strategy: 
+      matrix:
+        arch: ["386", "amd64", "arm"]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+
+    - name: set module
+      run:  go mod tidy
+
+    - name: Build
+      run: GOOS=windows GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath .
+
+    - name: Test
+      run: go test -json > TestResults-${{ matrix.arch }}.json
+    - name: Upload Go test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: Go-results-${{ matrix.arch }}
+        path: TestResults-${{ matrix.arch }}.json
