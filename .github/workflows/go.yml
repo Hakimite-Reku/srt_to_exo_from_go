@@ -67,7 +67,7 @@ jobs:
           prerelease: false
           title: "Development Auto Build"
           files: |
-            SRTtoEXE_*.exe
+            SRTtoEXO_*.exe
             config.yaml
             README.txt
             LICENSE
