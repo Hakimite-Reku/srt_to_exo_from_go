@@ -7,11 +7,15 @@ on:
   push:
     branches: [ "master" ]
 
+  pull_request:
+    branches: [ "master"]
+    types:    closed
+
 jobs:
 
   build:
     runs-on: ubuntu-latest
-    strategy: 
+    strategy:
       matrix:
         arch: ["386", "amd64", "arm"]
     steps:
@@ -25,8 +29,24 @@ jobs:
     - name: set module
       run:  go mod tidy
 
+    - name: Set config.yaml
+      run:  cp config.sample.yaml config.yaml
+
     - name: Build
-      run: GOOS=windows GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath .
+      run:  GOOS=windows GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath . -o SRTtoEXO-${{ matrix.arch }}.exe
+
+    - name: Upload .exe file
+      uses: actions/upload-artifact@v4
+      with:
+        name: exe_file
+        path: SRTtoEXO-${{ matrix.arch }}.exe
+
+    - name: Upload config file
+      uses: actions/upload-artifact@v4
+      with:
+        name: exe_file
+        path: config.yaml
+
 
     - name: Test
       run: go test -json > TestResults-${{ matrix.arch }}.json
@@ -35,3 +55,31 @@ jobs:
       with:
         name: Go-results-${{ matrix.arch }}
         path: TestResults-${{ matrix.arch }}.json
+
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["386", "amd64", "arm"]
+
+    steps:
+      - name: Download .exe file
+        uses: action/download-artifact@v4
+        with:
+          name: exe_file
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          repo_token: GITHUB_TOKEN
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Development Auto Build"
+          files: |
+            SRTtoEXE-*.exe
+            config.yaml
+            README.txt
+            LICENSE
+
