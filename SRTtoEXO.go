@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
-	"time"
 
 	srt "github.com/suapapa/go_subtitle"
 	"golang.org/x/text/encoding/japanese"
@@ -113,13 +113,21 @@ type SrtScript struct {
 }
 
 func main() {
+	// change directory
+	path, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	os.Chdir(filepath.Dir(path))
+
+	// .srt file open
 	var fileName string
 	if len(os.Args) < 2 {
-		fmt.Scanf("ファイルを指定してください\n%s", &fileName)
+		fmt.Println("ファイルを指定してください")
+		fmt.Scanf("%s", &fileName)
 	} else {
 		fileName = os.Args[1]
 	}
-	// .srt file open
 	file, err := os.Open(fileName)
 	// error
 	if err != nil {
@@ -134,7 +142,10 @@ func main() {
 
 	// read config.yaml
 	var conf Config
-	confFile, _ := os.ReadFile("config.yaml")
+	confFile, err := os.ReadFile("config.yaml")
+	if err != nil {
+		panic(err)
+	}
 	yaml.Unmarshal(confFile, &conf)
 
 	// header init
@@ -145,7 +156,7 @@ func main() {
 	str := new(strings.Builder)
 
 	// header write
-	exoFile, err := os.Create(fileName[:len(fileName)-4] + ".exo")
+	exoFile, err := os.Create(file.Name()[:len(file.Name())-4] + ".exo")
 	// error
 	if err != nil {
 		panic(err)
@@ -155,9 +166,7 @@ func main() {
 	sfjsEncoder := japanese.ShiftJIS.NewEncoder()
 	Encoder := unicode.UTF16(unicode.LittleEndian, unicode.IgnoreBOM).NewEncoder()
 
-
 	writer := transform.NewWriter(exoFile, sfjsEncoder)
-	defer exoFile.Close()
 
 	header.Execute(str, conf)
 	writer.Write([]byte(ConvertCRLF(str.String())))
@@ -167,17 +176,13 @@ func main() {
 	textObj := template.Must(template.New("textObj").Parse(TextObjFormat))
 	for _, script := range book {
 		conf.SrtScript.Idx = script.Idx - 1
-		conf.SrtScript.Start = TimeToFrame(script.Start, conf.FrameRate) + 1
-		conf.SrtScript.End = TimeToFrame(script.End, conf.FrameRate)
+		conf.SrtScript.Start = int(script.Start.Seconds() * float64(conf.UserConfig.FrameRate)) + 1
+		conf.SrtScript.End = int(script.End.Seconds() * float64(conf.UserConfig.FrameRate))
 		conf.SrtScript.Text = ConvertExoText(script.Text, Encoder)
 		textObj.Execute(str, conf)
 		writer.Write([]byte(ConvertCRLF(str.String())))
 		str.Reset()
 	}
-}
-
-func TimeToFrame(t time.Duration, fr int) int {
-	return int(t.Seconds() * float64(fr))
 }
 
 func ConvertExoText(str string, Encoder *encoding.Encoder) string {
