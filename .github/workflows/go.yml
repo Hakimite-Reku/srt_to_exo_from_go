@@ -61,6 +61,9 @@ jobs:
       - name: Set config.yaml
         run:  cp config.sample.yaml config.yaml
 
+      - name: Archive
+        run: zip SRTtoEXO.zip SRTtoEXO_*.exe config.yaml LICENSE README.txt
+
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -68,11 +71,4 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: false
           title: "Development Auto Build"
-          files: |
-            SRTtoEXO_386.exe
-            SRTtoEXO_amd64.exe
-            SRTtoEXO_arm.exe
-            config.yaml
-            README.txt
-            LICENSE
-
+          files: SRTtoEXO.zip
