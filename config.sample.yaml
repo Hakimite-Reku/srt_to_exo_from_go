@@ -1,5 +1,4 @@
 # UserConfig
-FilePath: example.srt
 # 動画サイズ [横幅, 縦幅]
 MovieSize: [1280, 720]
 FrameRate: 30
