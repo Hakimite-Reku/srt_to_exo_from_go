@@ -35,8 +35,8 @@ jobs:
     - name: Upload .exe file
       uses: actions/upload-artifact@v4
       with:
-        name: exe_file
-        path: SRTtoEXO_${{ matrix.arch }}.exe
+        name: SRTtoEXO_${{ matrix.arch }}.exe
+        path: exe_file
 
     - name: Test
       run: go test -json > TestResults-${{ matrix.arch }}.json
