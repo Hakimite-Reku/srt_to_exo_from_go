@@ -57,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: exe_file
-          pattern: SRTtoEXO_*
+          pattern: exe_file_*
           merge-multiple: true
 
       - name: Set config.yaml
