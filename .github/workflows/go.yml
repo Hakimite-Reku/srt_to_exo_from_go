@@ -55,6 +55,8 @@ jobs:
 
       - name: Download .exe file
         uses: actions/download-artifact@v4
+        with:
+          path: exe_file
 
       - name: Set config.yaml
         run:  cp config.sample.yaml config.yaml
