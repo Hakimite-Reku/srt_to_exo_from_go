@@ -33,7 +33,7 @@ jobs:
       run:  cp config.sample.yaml config.yaml
 
     - name: Build
-      run:  GOOS=windows GOARCH=${{ matrix.arch }} go build -ldflags="-s -w" -trimpath . -o SRTtoEXO-${{ matrix.arch }}.exe .
+      run:  GOOS=windows GOARCH=${{ matrix.arch }} go build -o SRTtoEXO-${{ matrix.arch }}.exe -ldflags="-s -w" -trimpath . .
 
     - name: Upload .exe file
       uses: actions/upload-artifact@v4
