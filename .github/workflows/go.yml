@@ -69,7 +69,9 @@ jobs:
           prerelease: false
           title: "Development Auto Build"
           files: |
-            SRTtoEXO_*.exe
+            SRTtoEXO_386.exe
+            SRTtoEXO_amd64.exe
+            SRTtoEXO_arm.exe
             config.yaml
             README.txt
             LICENSE
